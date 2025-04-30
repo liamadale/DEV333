@@ -1,5 +1,6 @@
 import re
 import time
+import shutil
 from datetime import datetime
 
 # INPUT VALIDATION FUNCTIONS
@@ -98,7 +99,7 @@ def calculate_totals(session):
     print(f"The total cost for {session['num_licenses']} licenses is ${base_total}.")
     if session['gold_supp_query'].lower() == "yes":
         print(f"You chose the Gold Support plan. At ${session['gold_supp_price']}/year. Adding this to the total cost.")
-        base_total =+ session['gold_supp_price']
+        base_total += session['gold_supp_price']
         print(f"The total cost for {session['num_licenses']} licenses with Gold Support is ${base_total}.")
     print("Tax for this product is 10%")
     tax = base_total * 0.10
@@ -148,6 +149,25 @@ def generate_receipt(session):
     print(f"Total Cost: ${session['price_total']:.2f}")
     print("Thank you for your purchase!")
 
+def print_fancy_title():
+    title_lines = [
+        "░█▀▀░█▀█░▀█▀░█▀▀░█▀█░▀█▀",
+        "░█░░░█▀█░░█░░█░█░█▀▀░░█░",
+        "░▀▀▀░▀░▀░░▀░░▀▀▀░▀░░░░▀░"
+    ]
+    
+    # Get terminal width for centering
+    terminal_width = shutil.get_terminal_size((80, 20)).columns
+    border = "═" * max(len(line) for line in title_lines)
+    padding = (terminal_width - len(border)) // 2
+    print("\n" + "═" * terminal_width + "\n")
+    print(" " * padding + "╔" + border + "╗")
+    for line in title_lines:
+        print(" " * padding + "║" + line + "║")
+    print(" " * padding + "╚" + border + "╝")
+    print(" "* (padding - 15) + 'CatGPT – Answers when it wants to. Otherwise, it’s naptime.')
+    print("\n" + "═" * terminal_width + "\n")
+
 # Main Program Loop
 
 while True:
@@ -155,9 +175,10 @@ while True:
     session['first_name'] = input("Enter your first name: ")
     session['last_name'] = input("Enter your last name: ")
 
-    print(f"Hello {session['first_name']} {session['last_name']}, welcome to the AI Chatbot!")
+    print(f"Hello {session['first_name']} {session['last_name']}, welcome to the CatGPT!")
 
-    print("I am here to assist you with your queries.")
+    print_fancy_title()
+
     while True:
         purchase_query = input("Would you like to make a purchase? (yes/no): ").strip().lower()
         if purchase_query in ["yes", "no"]:
@@ -186,7 +207,7 @@ while True:
         else:
             print("Invalid input. Please answer with 'yes' or 'no'.")
     if continue_query == "no":
-        print("Thank you for using the AI Chatbot! Goodbye!")
+        print("Thank you for using the CatGPT! Goodbye!")
         break
     else:
         print("Let's continue!")
