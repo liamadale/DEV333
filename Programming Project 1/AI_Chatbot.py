@@ -3,7 +3,12 @@ import time
 import shutil
 from datetime import datetime
 
-# INPUT VALIDATION FUNCTIONS
+LICENSE_COST = 75  # Cost per license
+TAX_RATE = 0.10  # Tax rate
+
+# ------------------------------
+# VALIDATION FUNCTIONS
+# ------------------------------
 
 def validate_email(email: str) -> bool:
     # Basic email pattern: local@domain.tld
@@ -52,7 +57,24 @@ def validate_zip_code(zip_code: str) -> bool:
     pattern = r'^\d{5}(-\d{4})?$'
     return re.match(pattern, zip_code) is not None
 
-# FUNCTIONS FOR USER INTERACTION
+# ------------------------------
+# USER INTERACTION FUNCTIONS
+# ------------------------------
+
+def get_user_name(session):
+    # User Name Collection
+    while True:
+        session['first_name'] = input("Please enter your first name: ")
+        if session['first_name'].isalpha():
+            break
+        else:
+            print("Invalid first name. Please try again.")
+    while True:
+        session['last_name'] = input("Please enter your last name: ")
+        if session['last_name'].isalpha():
+            break
+        else:
+            print("Invalid last name. Please try again.")
 
 def get_user_info(session):
     # User Data Collection
@@ -91,32 +113,32 @@ def gold_support(session):
     elif session['num_licenses'] >= 100:
         print("With the number of licenses you purchased the Gold Support plan is $250/year.")
         session['gold_supp_price'] = 250
-    session['gold_supp_query'] = input("Would you like to purchase the Gold Support plan? (yes/no): ")
+    session['gold_supp_query'] = input("Would you like to purchase the Gold Support plan? (yes/no): ").lower()
 
 def calculate_totals(session):
     # Calculating Total Cost
-    base_total = session['num_licenses'] * 75
+    base_total = session['num_licenses'] * LICENSE_COST
     print(f"The total cost for {session['num_licenses']} licenses is ${base_total}.")
     if session['gold_supp_query'].lower() == "yes":
         print(f"You chose the Gold Support plan. At ${session['gold_supp_price']}/year. Adding this to the total cost.")
         base_total += session['gold_supp_price']
         print(f"The total cost for {session['num_licenses']} licenses with Gold Support is ${base_total}.")
     print("Tax for this product is 10%")
-    tax = base_total * 0.10
+    tax = base_total * TAX_RATE
     session['price_total'] = base_total + tax
     print(f"The total cost including tax is ${session['price_total']}.")
 
 def collect_payment_info():
     # Payment Information
     while True:
-        credit_card_num = input("Please provide a credit card number to complete the purchase: ")
-        if validate_credit_card_number(credit_card_num):
+        session['credit_card_num'] = input("Please provide a credit card number to complete the purchase: ")
+        if validate_credit_card_number(session['credit_card_num']):
             break
         else:
             print("Invalid credit card number. Please try again.")
     while True:
-        credit_card_exp = input("Please provide the expiration date of your credit card (MM/YY): ")
-        if validate_expiration_date(credit_card_exp):
+        session['credit_card_exp'] = input("Please provide the expiration date of your credit card (MM/YY): ")
+        if validate_expiration_date(session['credit_card_exp']):
             break
         else:
             print("Invalid expiration date. Please try again.")
@@ -147,6 +169,8 @@ def generate_receipt(session):
     print(f"Number of Licenses: {session['num_licenses']}")
     print(f"Gold Support Plan: {session['gold_supp_query']}")
     print(f"Total Cost: ${session['price_total']:.2f}")
+    print(f"Credit Card: **** **** **** {session['credit_card_num'][-4:]}")
+    print(f"Expiration Date: {session['credit_card_exp']}")
     print("Thank you for your purchase!")
 
 def print_fancy_title():
@@ -168,14 +192,16 @@ def print_fancy_title():
     print(" "* (padding - 15) + 'CatGPT – Answers when it wants to. Otherwise, it’s naptime.')
     print("\n" + "═" * terminal_width + "\n")
 
-# Main Program Loop
+# ------------------------------
+# MAIN PROGRAM
+# ------------------------------
 
 while True:
     session = {}
-    session['first_name'] = input("Enter your first name: ")
-    session['last_name'] = input("Enter your last name: ")
-
-    print(f"Hello {session['first_name']} {session['last_name']}, welcome to the CatGPT!")
+    print("Welcome to CatGPT!")
+    print("Please enter your name to get started.")
+    get_user_name(session)
+    print(f"Hello {session['first_name']} {session['last_name']}!")
 
     print_fancy_title()
 
@@ -207,7 +233,7 @@ while True:
         else:
             print("Invalid input. Please answer with 'yes' or 'no'.")
     if continue_query == "no":
-        print("Thank you for using the CatGPT! Goodbye!")
+        print(f"Thank you {session["first_name"]} {session["last_name"]} for using the CatGPT! Goodbye!")
         break
     else:
         print("Let's continue!")
