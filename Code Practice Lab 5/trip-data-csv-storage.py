@@ -29,9 +29,12 @@ while True:
         if pandas.read_csv("trip-data.csv").empty:  
             print("The CSV file is empty. Creating a new one.")
         else:
+            print()
             print(pandas.read_csv("trip-data.csv"))
     else:
         print("The CSV file does not exist. Creating a new one.")
+
+    print()
 
     miles_driven = validate_input("Enter miles driven: ", "Miles driven")
 
@@ -49,7 +52,11 @@ while True:
 
     df.to_csv("trip-data.csv", mode='a', header=not os.path.exists("trip-data.csv"), index=False)
 
+    print()
+
     print(pandas.read_csv("trip-data.csv"))
+
+    print()
 
     more_entries = validate_y_or_n("More entries? (y or n): ")
     if more_entries.lower() != "y":
