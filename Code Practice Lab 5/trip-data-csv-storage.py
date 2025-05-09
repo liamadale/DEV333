@@ -40,7 +40,8 @@ while True:
 
     gallons_of_gas = validate_input("Enter gallons of gas used: ", "Gallons of gas")
 
-    miles_per_gallon = validate_input("Enter miles per gallon: ", "Miles per gallon")
+    miles_per_gallon = round(miles_driven / gallons_of_gas, 2)
+    print(f"Miles Per Gallon: {miles_per_gallon}")
 
     data = {
         "Distance": [miles_driven],
