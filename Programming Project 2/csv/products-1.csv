@@ -1,0 +1,21 @@
+product_id,product_name,category,price
+1,Laptop,Peripherals,97
+2,Smartphone,Networking,233
+3,Tablet,Accessories,66
+4,Headphones,Peripherals,1381
+5,Charger,Peripherals,1468
+6,Keyboard,Networking,1665
+7,Mouse,Networking,501
+8,Monitor,Electronics,1242
+9,Printer,Accessories,919
+10,Camera,Networking,417
+11,Speaker,Networking,1038
+12,Router,Electronics,1630
+13,USB Cable,Networking,857
+14,Hard Drive,Accessories,532
+15,SSD,Networking,93
+16,Memory Card,Peripherals,93
+17,Projector,Electronics,1135
+18,Smartwatch,Networking,662
+19,Drone,Electronics,1902
+20,VR Headset,Electronics,1131
