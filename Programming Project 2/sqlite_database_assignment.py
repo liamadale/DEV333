@@ -1,8 +1,18 @@
 import sqlite3
 import pandas as pd
 
+#   ███████╗ ██████╗ ██╗         ██╗███╗   ██╗██╗████████╗
+#   ██╔════╝██╔═══██╗██║         ██║████╗  ██║██║╚══██╔══╝
+#   ███████╗██║   ██║██║         ██║██╔██╗ ██║██║   ██║   
+#   ╚════██║██║▄▄ ██║██║         ██║██║╚██╗██║██║   ██║   
+#   ███████║╚██████╔╝███████╗    ██║██║ ╚████║██║   ██║   
+#   ╚══════╝ ╚══▀▀═╝ ╚══════╝    ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   
+
 # Check if SQLite is available
 def check_sqlite():
+    """
+    Checks if SQLite is available in the Python environment and prints the current version.
+    """
     try:
         sqlite3_version = sqlite3.sqlite_version
         print(f"SQLite is available, version: {sqlite3_version}")
@@ -10,7 +20,9 @@ def check_sqlite():
         print("SQLite is not installed or not available in this Python environment")
 
 # Initialize the database with sample data
-def initialize_database():
+def create_and_populate_table(cursor, connection):
+    """
+    Creates the employees table if it doesn't exist and populates it with sample employee records using a pandas DataFrame.    """
     # Create a table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS employees (
@@ -60,34 +72,56 @@ def initialize_database():
 
     df = pd.DataFrame(data)
 
-    # Connect to SQLite database
-    connection = sqlite3.connect("my_database.db")
     # Insert DataFrame into database table "employees"
     df.to_sql("employees", connection, if_exists="replace", index=False) #replace
     print("Data inserted successfully")
 
 # Display the table to verify initalization of data
-def verify_table_creation():
+def verify_table_creation(connection):
+    """
+    Queries the employees table and prints the full dataset using pandas to confirm successful creation and insertion.
+    """
     # Verify insertion by querying the table
     result = pd.read_sql("SELECT * FROM employees", connection)
     print(result)
 
 # Fetch all data from the table
-def fetch_all_data():
+def fetch_all_data(cursor):
+    """
+    Executes a SELECT * query to fetch and print all employee records from the database.
+    """
+    cursor.execute("SELECT * FROM employees")
     # Fetch all rows and print
     rows = cursor.fetchall()
     for row in rows:
         print(row)
 
+#    ██████╗  █████╗ ████████╗ █████╗                
+#    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗               
+#    ██║  ██║███████║   ██║   ███████║               
+#    ██║  ██║██╔══██║   ██║   ██╔══██║               
+#    ██████╔╝██║  ██║   ██║   ██║  ██║               
+#    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝               
+#     █████╗  ██████╗ ██████╗███████╗███████╗███████╗
+#    ██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝
+#    ███████║██║     ██║     █████╗  ███████╗███████╗
+#    ██╔══██║██║     ██║     ██╔══╝  ╚════██║╚════██║
+#    ██║  ██║╚██████╗╚██████╗███████╗███████║███████║
+#    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝
+
 # List all user's first and last names
-def list_user_names():
+def list_names(cursor):
+    """
+    Returns a list of all employee first and last names from the database.
+    """
     cursor.execute("SELECT first_name, last_name FROM employees")
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
+    return cursor.fetchall()
 
 # Creates a contact list of all employees
-def create_contact_list():
+def create_contact_list(cursor):
+    """
+    Returns a list of dictionaries with each employee's first name, last name, and email address.
+    """
     cursor.execute("SELECT first_name, last_name, email_address FROM employees")
     rows = cursor.fetchall()
     contact_list = []
@@ -99,41 +133,56 @@ def create_contact_list():
         })
     return contact_list
 
-# Loads table into a DataFrame
-def load_data_into_dataframe():
-    # Load data into a DataFrame
-    df = pd.read_sql_query("SELECT * FROM employees", connection)
-    print(df.head())
+def count_employees_by_state(cursor):
+    """
+    Returns a list of tuples with the number of employees grouped and ordered by U.S. state.
+    """
+    cursor.execute("""
+        SELECT state, COUNT(*) as employee_count
+        FROM employees
+        GROUP BY state
+        ORDER BY employee_count DESC
+    """)
+    return cursor.fetchall()
+
+
+#     ███╗   ███╗ █████╗ ██╗███╗   ██╗
+#     ████╗ ████║██╔══██╗██║████╗  ██║
+#     ██╔████╔██║███████║██║██╔██╗ ██║
+#     ██║╚██╔╝██║██╔══██║██║██║╚██╗██║
+#     ██║ ╚═╝ ██║██║  ██║██║██║ ╚████║
+#     ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
 
 def main():
-
     check_sqlite()
-
     connection = sqlite3.connect("my_database.db")
-
-    # Create a cursor object
     cursor = connection.cursor()
 
     try:
-        connection = sqlite3.connect("my_database.db")
-        cursor = connection.cursor()
-        # Perform operations
+        print("Populatiing database with sample data...")
+        create_and_populate_table(cursor, connection)
+        print("\n--- Verifying table creation ---\n")
+        verify_table_creation(connection)
+        print("\n--- Fetching all data ---\n")
+        print(fetch_all_data(cursor))
+        print("\n" + "*" * 24)
+        print("~~~ Unique Functions ~~~")
+        print("*" * 24 + "\n")
+        print("\n--- Names List ---\n")
+        all_names = list_names(cursor)
+        for name in all_names:
+            print(name)
+        print("\n--- Contact List ---\n")
+        contact_list = create_contact_list(cursor)        
+        for contact in contact_list:
+            print(contact)
+        print("\n--- Employees by State ---\n")
+        employees_by_state = count_employees_by_state(cursor)
+        for state, count in employees_by_state:
+            print(f"{state}: {count}")
     finally:
-        if connection:
-            connection.close()
-            print("SQLite connection closed")
-
-    initialize_database()
-
-    verify_table_creation()
-
-    fetch_all_data()
-
-    list_user_names()
-
-    create_contact_list()
-
-    load_data_into_dataframe()
+        connection.close()
+        print("SQLite connection closed")
 
 if __name__ == "__main__":
     main()
